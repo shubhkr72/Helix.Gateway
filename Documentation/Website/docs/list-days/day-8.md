@@ -1,0 +1,7 @@
+﻿---
+slug: day-8
+title: Day 8
+---
+# Day 8
+
+Add your content here.
