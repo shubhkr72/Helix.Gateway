@@ -1,19 +1,50 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/shubhkr72/helix/internal/backend"
+	"os"
+	"github.com/shubhkr72/helix/internal/handlers"
 )
+
+type Response struct {
+	Instance string              `json:"instance"`
+	Method   string              `json:"method"`
+	Path     string              `json:"path"`
+	Query    string              `json:"query"`
+	Headers  map[string][]string `json:"headers"`
+}
 
 func main() {
 
-	mux := http.NewServeMux()
+	name := os.Getenv("INSTANCE")
+	if name == "" {
+		name = "backend-1"
+	}
+	http.HandleFunc("/backend",handlers.Backend1)
 
-	mux.HandleFunc("/", backend.MockHandler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Mock backend running on :8081")
+		fmt.Println(r.Method,r.URL)
 
-	log.Fatal(http.ListenAndServe(":8081", mux))
+		resp := Response{
+			Instance: name,
+			Method:   r.Method,
+			Path:     r.URL.Path,
+			Query:    r.URL.RawQuery,
+			Headers: map[string][]string{
+				"X-Forwarded-For":   r.Header["X-Forwarded-For"],
+				"X-Forwarded-Proto": r.Header["X-Forwarded-Proto"],
+				"User-Agent":        r.Header["User-Agent"],
+			},
+		}
+
+		json.NewEncoder(w).Encode(resp)
+	})
+
+	log.Println("mock backend :9000")
+
+	log.Fatal(http.ListenAndServe(":9000", nil))
 }
