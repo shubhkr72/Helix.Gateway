@@ -1,4 +1,4 @@
-﻿---
+---
 slug: day-1
 title: Day 1
 ---
@@ -131,13 +131,13 @@ Always:
 
   Method    Purpose                    Idempotent
   --------- -------------------------- ------------
-  GET       Read                       âœ…
-  POST      Create                     âŒ
-  PUT       Replace entire resource    âœ…
-  PATCH     Partial update             Usually âŒ
-  DELETE    Delete                     âœ…
-  HEAD      Same as GET without body   âœ…
-  OPTIONS   Supported methods          âœ…
+  GET       Read                       ✅
+  POST      Create                     ❌
+  PUT       Replace entire resource    ✅
+  PATCH     Partial update             Usually ❌
+  DELETE    Delete                     ✅
+  HEAD      Same as GET without body   ✅
+  OPTIONS   Supported methods          ✅
 
 Examples:
 

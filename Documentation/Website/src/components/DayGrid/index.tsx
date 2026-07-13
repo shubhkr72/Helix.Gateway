@@ -3,7 +3,7 @@ import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
 export default function DayGrid() {
-  const days = Array.from({ length: 30 }, (_, i) => i + 1);
+  const days = Array.from({ length: 29 }, (_, i) => i + 1);
 
   return (
     <section className={styles.sectionWrapper}>
