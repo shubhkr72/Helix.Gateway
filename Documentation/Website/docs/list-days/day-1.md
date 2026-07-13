@@ -1,6 +1,7 @@
 ---
 slug: day-1
 title: Day 1
+sidebar_position: 1
 ---
 # Go HTTP Fundamentals Study Notes
 

@@ -1,6 +1,7 @@
-﻿---
+---
 slug: day-20
 title: Day 20
+sidebar_position: 20
 ---
 # Day 20
 

@@ -1,6 +1,7 @@
-﻿---
+---
 slug: day-17
 title: Day 17
+sidebar_position: 17
 ---
 # Day 17
 

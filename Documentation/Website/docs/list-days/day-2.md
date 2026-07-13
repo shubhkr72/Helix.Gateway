@@ -1,11 +1,12 @@
-﻿---
+---
 slug: day-2
 title: Day 2
+sidebar_position: 2
 ---
 # Day 2 - Reverse Proxy Core (Learning Notes)
 
 > Goal: Understand how Go's `httputil.ReverseProxy` works, why it is designed the way it is, and how to build a secure reverse proxy.
-
+sidebar_position: 2
 ---
 
 # Table of Contents
