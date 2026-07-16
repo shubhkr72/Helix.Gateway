@@ -5,15 +5,8 @@ import (
 	"net/http"
 )
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-func WriteJSONError(w http.ResponseWriter, status int, message string) {
+func WriteError(w http.ResponseWriter, status int, body map[string]any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-
-	_ = json.NewEncoder(w).Encode(ErrorResponse{
-		Error: message,
-	})
+	json.NewEncoder(w).Encode(body)
 }

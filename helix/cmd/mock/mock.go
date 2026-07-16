@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/shubhkr72/helix/internal/handlers"
 	"log"
 	"net/http"
 	"os"
-	"github.com/shubhkr72/helix/internal/handlers"
 )
 
 type Response struct {
@@ -23,11 +23,11 @@ func main() {
 	if name == "" {
 		name = "backend-1"
 	}
-	http.HandleFunc("/backend",handlers.Backend1)
+	http.HandleFunc("/backend", handlers.Backend1)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-		fmt.Println(r.Method,r.URL)
+		fmt.Println(r.Method, r.URL)
 
 		resp := Response{
 			Instance: name,

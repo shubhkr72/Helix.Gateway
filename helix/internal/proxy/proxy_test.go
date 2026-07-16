@@ -2,11 +2,11 @@ package proxy
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"context"
 )
 
 func newBackend() *httptest.Server {

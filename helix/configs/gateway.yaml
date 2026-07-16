@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+timeouts:
+  dial: 5s
+  response_header: 10s
+
+routes:
+  - id: auth
+    path: /auth
+    backend:
+      - http://localhost:9001
+    strip_prefix: true
+
+  - id: users
+    path: /users
+    backend:
+      - http://localhost:9002
+    strip_prefix: true
+
+  - id: orders
+    path: /orders
+    backend:
+      - http://localhost:9003
+    strip_prefix: false
+
+  - id: payments
+    path: /payments
+    backend:
+      - http://localhost:9004
+    strip_prefix: false
