@@ -29,3 +29,39 @@ routes:
     backend:
       - http://localhost:9004
     strip_prefix: false
+
+  - id: inventory
+    path: /inventory
+    backend:
+      - http://localhost:9005
+    strip_prefix: true
+
+  - id: products
+    path: /products
+    backend:
+      - http://localhost:9006
+    strip_prefix: true
+
+  - id: notifications
+    path: /notifications
+    backend:
+      - http://localhost:9007
+    strip_prefix: false
+
+  - id: analytics
+    path: /analytics
+    backend:
+      - http://localhost:9008
+    strip_prefix: false
+
+  - id: reviews
+    path: /reviews
+    backend:
+      - http://localhost:9009
+    strip_prefix: true
+
+  - id: search
+    path: /search
+    backend:
+      - http://localhost:9010
+    strip_prefix: true
