@@ -6,6 +6,7 @@ import (
 
 	"github.com/shubhkr72/helix/internal/config"
 	"github.com/shubhkr72/helix/internal/handlers"
+	"github.com/shubhkr72/helix/internal/gateway"
 )
 
 func main() {
@@ -15,7 +16,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Listening on :%d", cfg.Server.Port)
+	// log.Printf("Listening on :%d", cfg.Server.Port)
+	gateway.PrintBanner(cfg)
 
 	http.ListenAndServe(
 		":"+"8080",
