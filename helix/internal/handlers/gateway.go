@@ -41,6 +41,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StatusNotFound,
 			map[string]any{
 				"error": "route not found",
+				"method":r.Method,
 				"path":  r.URL.Path,
 			},
 		)
