@@ -3,8 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-
+	"log"
 	"github.com/shubhkr72/helix/internal/config"
+	"github.com/shubhkr72/helix/internal/middleware"
 )
 
 func AllServices(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
@@ -34,6 +35,10 @@ func AllServices(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	})
 }
 func Home(w http.ResponseWriter, r *http.Request) {
+	id := middleware.GetRequestID(r.Context())
+
+    log.Println("Request ID:", id)
+
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(map[string]any{
@@ -43,11 +48,29 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func Healthz(w http.ResponseWriter, r *http.Request) {
+	id := middleware.GetRequestID(r.Context())
+
+	log.Println("Request ID:", id)
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ok"))
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":     "ok",
+		"request_id": id,
+	})
 }
 
 func Readyz(w http.ResponseWriter, r *http.Request) {
+	id := middleware.GetRequestID(r.Context())
+
+	log.Println("Request ID:", id)
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ready"))
+
+	json.NewEncoder(w).Encode(map[string]any{
+		"status":     "ready",
+		"request_id": id,
+	})
 }
