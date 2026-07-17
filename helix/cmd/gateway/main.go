@@ -23,11 +23,12 @@ func main() {
 		Config: cfg,
 	}
 
-	// Wrap with middleware
-	handlerWithMiddleware := middleware.RequestID(handler)
+	handlerWithMiddleware :=
+		middleware.RequestID(
+			middleware.Logging(
+				handler,
+			),
+		)
 
-	log.Fatal(http.ListenAndServe(
-		":8080",
-		handlerWithMiddleware,
-	))
+	log.Fatal(http.ListenAndServe(":8080", handlerWithMiddleware))
 }

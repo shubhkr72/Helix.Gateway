@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"log"
+	
 	"github.com/shubhkr72/helix/internal/config"
 	"github.com/shubhkr72/helix/internal/middleware"
 )
@@ -35,9 +35,9 @@ func AllServices(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	})
 }
 func Home(w http.ResponseWriter, r *http.Request) {
-	id := middleware.GetRequestID(r.Context())
+	// id := middleware.GetRequestID(r.Context())
 
-    log.Println("Request ID:", id)
+    // log.Println("Request ID:", id)
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -50,7 +50,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func Healthz(w http.ResponseWriter, r *http.Request) {
 	id := middleware.GetRequestID(r.Context())
 
-	log.Println("Request ID:", id)
+	// log.Println("Request ID:", id)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -64,7 +64,7 @@ func Healthz(w http.ResponseWriter, r *http.Request) {
 func Readyz(w http.ResponseWriter, r *http.Request) {
 	id := middleware.GetRequestID(r.Context())
 
-	log.Println("Request ID:", id)
+	// log.Println("Request ID:", id)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
