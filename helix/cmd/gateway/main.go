@@ -32,3 +32,6 @@ func main() {
 
 	log.Fatal(http.ListenAndServe(":8080", handlerWithMiddleware))
 }
+
+// panic recovery
+// cors middleware left
