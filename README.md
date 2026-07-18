@@ -471,16 +471,5 @@ Planned advanced work will be handled separately so it does not weaken the first
 - TLS automation
 - Kubernetes and Helm deployment
 
-## Engineering principles
-
-1. Prefer clear standard-library code over unnecessary abstraction.
-2. Validate configuration before changing live traffic.
-3. Never trust identity or forwarding headers supplied by clients.
-4. Never hold locks during network requests.
-5. Keep metric labels bounded.
-6. Cache only when privacy and invalidation behavior are explicit.
-7. Every important feature needs a failure-path test.
-8. Document limitations honestly and use measured performance claims.
-
 ## License
 A license will be selected before the first public release.
