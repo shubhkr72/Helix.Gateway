@@ -16,6 +16,11 @@ func NewHandler(service *Service) *Handler {
 	}
 }
 
+// GET /
+func (h *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("auth service is running"))
+}
+
 // POST /register
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 

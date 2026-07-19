@@ -15,3 +15,9 @@ run-gateway:
 
 run-backend:
 	go run ./cmd/mock
+
+run-auth:
+	go run ./cmd/auth
+
+run-auth-postgres:
+	docker compose -f deployments/docker-compose.yml up -d
