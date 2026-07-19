@@ -1,24 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/shubhkr72/helix/internal/auth"
 	"github.com/shubhkr72/helix/internal/authconfig"
 	"github.com/shubhkr72/helix/internal/database"
+	"github.com/shubhkr72/helix/internal/jwt"
 )
 
 func main() {
-
-	fmt.Println("Loading configuration...")
 
 	cfg, err := authconfig.Load("configs/auth.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("Connecting to PostgreSQL...")
 
 	db, err := database.New(cfg.Database)
 	if err != nil {
@@ -26,13 +24,28 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("Connected successfully.")
+	repo := auth.NewPostgresRepository(db)
 
-	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", cfg.Server.Port),
+	jwtMgr, err := jwt.NewManager(
+		"keys/private.pem",
+		"keys/public.pem",
+		cfg.JWT.Issuer,
+		cfg.JWT.Audience,
+		time.Duration(cfg.JWT.Expiry)*time.Minute,
+	)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	fmt.Printf("Auth Service listening on :%d\n", cfg.Server.Port)
+	service := auth.NewService(repo, jwtMgr)
 
-	log.Fatal(server.ListenAndServe())
+	handler := auth.NewHandler(service)
+
+	mux := http.NewServeMux()
+
+	auth.RegisterRoutes(mux, handler)
+
+	log.Println("Auth Service listening on :9001")
+
+	log.Fatal(http.ListenAndServe(":9001", mux))
 }

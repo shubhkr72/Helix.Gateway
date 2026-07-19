@@ -1,0 +1,131 @@
+Helix Auth Service - PostgreSQL Setup & Run Guide
+
+1. Start PostgreSQL
+
+From the project root:
+
+    docker compose -f deployments/docker-compose.yml up -d
+
+Check running containers:
+
+    docker ps
+
+View PostgreSQL logs:
+
+    docker logs helix-postgres
+
+------------------------------------------------------------------------
+
+2. Stop PostgreSQL
+
+    docker compose -f deployments/docker-compose.yml down
+
+Remove volumes (deletes all database data):
+
+    docker compose -f deployments/docker-compose.yml down -v
+
+------------------------------------------------------------------------
+
+3. Run Database Migrations
+
+Run from the project root:
+
+    migrate -path migrations -database "postgres://admin:<PASSWORD>@localhost:5432/helix_auth?sslmode=disable" up
+
+Rollback the latest migration:
+
+    migrate -path migrations -database "postgres://admin:<PASSWORD>@localhost:5432/helix_auth?sslmode=disable" down 1
+
+------------------------------------------------------------------------
+
+4. Verify Tables
+
+Open PostgreSQL:
+
+    docker exec -it helix-postgres psql -U admin -d helix_auth
+
+List tables:
+
+    \dt
+
+Describe users table:
+
+    \d users
+
+Show users:
+
+    SELECT * FROM users;
+
+Exit:
+
+    \q
+
+------------------------------------------------------------------------
+
+5. Run the Auth Service
+
+    go run ./cmd/auth
+
+Expected:
+
+    Auth Service listening on :9001
+
+------------------------------------------------------------------------
+
+6. Test Register
+
+POST http://localhost:9001/register
+
+Body:
+
+    {
+      "email": "admin@example.com",
+      "password": "password123"
+    }
+
+------------------------------------------------------------------------
+
+7. Test Login
+
+POST http://localhost:9001/login
+
+Body:
+
+    {
+      "email": "admin@example.com",
+      "password": "password123"
+    }
+
+Expected response:
+
+    {
+      "token": "<JWT_TOKEN>"
+    }
+
+------------------------------------------------------------------------
+
+8. Helpful Docker Commands
+
+Start:
+
+    docker compose -f deployments/docker-compose.yml up -d
+
+Stop:
+
+    docker compose -f deployments/docker-compose.yml down
+
+Restart:
+
+    docker compose -f deployments/docker-compose.yml restart
+
+Show running containers:
+
+    docker ps
+
+Show logs:
+
+    docker logs helix-postgres
+
+Enter PostgreSQL:
+
+    docker exec -it helix-postgres psql -U admin -d helix_auth

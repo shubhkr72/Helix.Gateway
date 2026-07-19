@@ -28,7 +28,7 @@ type DatabaseConfig struct {
 type JWTConfig struct {
 	Issuer   string `yaml:"issuer"`
 	Audience string `yaml:"audience"`
-	Expiry   string `yaml:"expiry"`
+	Expiry   int `yaml:"expiry"`
 }
 
 func Load(path string) (*Config, error) {
