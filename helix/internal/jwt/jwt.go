@@ -61,7 +61,7 @@ func NewAuthManager(
 	}, nil
 }
 
-//gatwey manager
+// gatwey manager
 func NewGatewayManager(
 	publicKeyPath string,
 	issuer string,

@@ -5,63 +5,80 @@ timeouts:
   dial: 5s
   response_header: 10s
 
+jwt:
+  issuer: helix-auth
+  audience: helix-gateway
+  public_key: keys/public.pem
+
 routes:
   - id: auth
     path: /auth
     backend:
       - http://localhost:9001
     strip_prefix: true
+    public: true
 
   - id: users
     path: /users
     backend:
       - http://localhost:9002
     strip_prefix: true
+    authenticated: true
 
   - id: orders
     path: /orders
     backend:
       - http://localhost:9003
     strip_prefix: false
+    authenticated: true
 
   - id: payments
     path: /payments
     backend:
       - http://localhost:9004
     strip_prefix: false
+    authenticated: true
 
   - id: inventory
     path: /inventory
     backend:
       - http://localhost:9005
     strip_prefix: true
+    authenticated: true
 
   - id: products
     path: /products
     backend:
       - http://localhost:9006
     strip_prefix: true
+    public: true
 
   - id: notifications
     path: /notifications
     backend:
       - http://localhost:9007
     strip_prefix: false
+    authenticated: true
 
   - id: analytics
     path: /analytics
     backend:
       - http://localhost:9008
     strip_prefix: false
+    authenticated: true
+    roles:
+      - admin
 
   - id: reviews
     path: /reviews
     backend:
       - http://localhost:9009
     strip_prefix: true
+    public: true
 
   - id: search
     path: /search
     backend:
       - http://localhost:9010
     strip_prefix: true
+    public: true

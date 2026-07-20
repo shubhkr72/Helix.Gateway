@@ -4,16 +4,19 @@ import (
 	"net/http"
 
 	"github.com/shubhkr72/helix/internal/config"
+	"github.com/shubhkr72/helix/internal/jwt"
+	"github.com/shubhkr72/helix/internal/proxy"
 	"github.com/shubhkr72/helix/internal/router"
 )
 
 type Gateway struct {
-	Config *config.Config
+	Config  *config.Config
+	JWT     *jwt.Manager
+	Proxies map[string]*proxy.Gateway
 }
 
 func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	// Gateway-owned endpoints
 	switch r.URL.Path {
 	case "/":
 		Home(w, r)
@@ -32,7 +35,6 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Match configured routes
 	match := router.MatchRoute(g.Config.Routes, r.URL.Path)
 
 	if !match.Found {
@@ -48,6 +50,19 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Day 4: Replace this with reverse proxy
-	w.Write([]byte("Matched " + match.Route.ID + " -> " + match.Path))
+	p, ok := g.Proxies[match.Route.ID]
+	if !ok {
+		WriteError(
+			w,
+			http.StatusServiceUnavailable,
+			map[string]any{
+				"error": "backend unavailable",
+			},
+		)
+		return
+	}
+
+	r.URL.Path = match.Path
+
+	p.ServeHTTP(w, r)
 }

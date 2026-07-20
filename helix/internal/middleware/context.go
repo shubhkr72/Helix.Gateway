@@ -4,11 +4,11 @@ import "context"
 
 type contextKey string
 
-const RequestIDKey contextKey = "request_id"
+const (
+	RequestIDKey contextKey = "request_id"
+)
 
 func GetRequestID(ctx context.Context) string {
-	if id, ok := ctx.Value(RequestIDKey).(string); ok {
-		return id
-	}
-	return ""
+	id, _ := ctx.Value(RequestIDKey).(string)
+	return id
 }

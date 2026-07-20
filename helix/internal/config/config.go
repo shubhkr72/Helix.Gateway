@@ -21,14 +21,25 @@ type Config struct {
 		ResponseHeader time.Duration `yaml:"response_header"`
 	} `yaml:"timeouts"`
 
+	JWT JWTConfig `yaml:"jwt"`
+
 	Routes []Route `yaml:"routes"`
 }
 
+type JWTConfig struct {
+	Issuer    string `yaml:"issuer"`
+	Audience  string `yaml:"audience"`
+	PublicKey string `yaml:"public_key"`
+}
+
 type Route struct {
-	ID          string   `yaml:"id"`
-	Path        string   `yaml:"path"`
-	Backend     []string `yaml:"backend"`
-	StripPrefix bool     `yaml:"strip_prefix"`
+	ID            string   `yaml:"id"`
+	Path          string   `yaml:"path"`
+	Backend       []string `yaml:"backend"`
+	StripPrefix   bool     `yaml:"strip_prefix"`
+	Public        bool     `yaml:"public"`
+	Authenticated bool     `yaml:"authenticated"`
+	Roles         []string `yaml:"roles"`
 }
 
 func Load(path string) (*Config, error) {

@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
+
+	"github.com/shubhkr72/helix/internal/auth"
 )
 
 type Gateway struct {
@@ -22,22 +25,31 @@ func New(target string) (*Gateway, error) {
 	}
 
 	rp := &httputil.ReverseProxy{
-
 		Transport: NewTransport(),
 
 		Rewrite: func(pr *httputil.ProxyRequest) {
-
-			// reject spoofed forwarding headers
 
 			pr.Out.Header.Del("X-Forwarded-For")
 			pr.Out.Header.Del("X-Forwarded-Host")
 			pr.Out.Header.Del("X-Forwarded-Proto")
 
-			pr.SetURL(u)
+			pr.Out.Header.Del("X-User-ID")
+			pr.Out.Header.Del("X-Email")
+			pr.Out.Header.Del("X-Roles")
 
+			pr.SetURL(u)
 			pr.SetXForwarded()
 
 			pr.Out.Host = u.Host
+
+			principal := auth.GetPrincipal(pr.In.Context())
+			if principal == nil {
+				return
+			}
+
+			pr.Out.Header.Set("X-User-ID", principal.UserID)
+			pr.Out.Header.Set("X-Email", principal.Email)
+			pr.Out.Header.Set("X-Roles", strings.Join(principal.Roles, ","))
 		},
 
 		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
@@ -74,7 +86,8 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func requestID() string {
 
 	b := make([]byte, 8)
-	rand.Read(b)
+
+	_, _ = rand.Read(b)
 
 	return hex.EncodeToString(b)
 }
