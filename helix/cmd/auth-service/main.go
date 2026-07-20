@@ -26,7 +26,7 @@ func main() {
 
 	repo := auth.NewPostgresRepository(db)
 
-	jwtMgr, err := jwt.NewManager(
+	jwtMgr, err := jwt.NewAuthManager(
 		"keys/private.pem",
 		"keys/public.pem",
 		cfg.JWT.Issuer,

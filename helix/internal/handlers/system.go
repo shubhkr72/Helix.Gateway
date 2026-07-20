@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"net/http"
 	"github.com/shubhkr72/helix/internal/config"
 	"github.com/shubhkr72/helix/internal/middleware"
+	"net/http"
 )
 
 func AllServices(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
@@ -34,7 +34,7 @@ func AllServices(w http.ResponseWriter, r *http.Request, cfg *config.Config) {
 	})
 }
 func Home(w http.ResponseWriter, r *http.Request) {
-    // log.Println("Request ID:", id)
+	// log.Println("Request ID:", id)
 
 	w.Header().Set("Content-Type", "application/json")
 

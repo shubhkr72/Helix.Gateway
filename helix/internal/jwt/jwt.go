@@ -18,13 +18,13 @@ type Manager struct {
 }
 
 type Claims struct {
-	Role string `json:"role"`
-
+	Email string   `json:"email"`
+	Roles []string `json:"roles"`
 	jwtlib.RegisteredClaims
 }
 
 // NewManager loads the RSA keys.
-func NewManager(
+func NewAuthManager(
 	privateKeyPath string,
 	publicKeyPath string,
 	issuer string,
@@ -61,16 +61,46 @@ func NewManager(
 	}, nil
 }
 
+//gatwey manager
+func NewGatewayManager(
+	publicKeyPath string,
+	issuer string,
+	audience string,
+) (*Manager, error) {
+
+	publicBytes, err := os.ReadFile(publicKeyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	publicKey, err := jwtlib.ParseRSAPublicKeyFromPEM(publicBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Manager{
+		publicKey: publicKey,
+		issuer:    issuer,
+		audience:  audience,
+	}, nil
+}
+
 // GenerateToken creates a signed JWT.
 func (m *Manager) GenerateToken(
 	userID string,
-	role string,
+	email string,
+	roles []string,
 ) (string, error) {
+
+	if m.privateKey == nil {
+		return "", jwtlib.ErrInvalidKey
+	}
 
 	now := time.Now()
 
 	claims := Claims{
-		Role: role,
+		Email: email,
+		Roles: roles,
 		RegisteredClaims: jwtlib.RegisteredClaims{
 			Subject:   userID,
 			Issuer:    m.issuer,
@@ -92,12 +122,21 @@ func (m *Manager) GenerateToken(
 // VerifyToken validates a JWT.
 func (m *Manager) VerifyToken(tokenString string) (*Claims, error) {
 
+	if m.publicKey == nil {
+		return nil, jwtlib.ErrInvalidKey
+	}
 	token, err := jwtlib.ParseWithClaims(
 		tokenString,
 		&Claims{},
 		func(token *jwtlib.Token) (interface{}, error) {
+			if token.Method != jwtlib.SigningMethodRS256 {
+				return nil, jwtlib.ErrTokenSignatureInvalid
+			}
+
 			return m.publicKey, nil
 		},
+		jwtlib.WithIssuer(m.issuer),
+		jwtlib.WithAudience(m.audience),
 	)
 
 	if err != nil {

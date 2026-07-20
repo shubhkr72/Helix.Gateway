@@ -87,6 +87,7 @@ func (s *Service) Login(
 	token, err := s.jwt.GenerateToken(
 		user.ID,
 		user.Role,
+		[]string{user.Role},
 	)
 
 	if err != nil {

@@ -29,7 +29,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case "/allservices":
 		AllServices(w, r, g.Config)
-	return
+		return
 	}
 
 	// Match configured routes
@@ -40,9 +40,9 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w,
 			http.StatusNotFound,
 			map[string]any{
-				"error": "route not found",
-				"method":r.Method,
-				"path":  r.URL.Path,
+				"error":  "route not found",
+				"method": r.Method,
+				"path":   r.URL.Path,
 			},
 		)
 		return
