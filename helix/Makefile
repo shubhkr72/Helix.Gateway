@@ -17,7 +17,10 @@ run-backend:
 	go run ./cmd/mock
 
 run-auth:
-	go run ./cmd/auth
+	go run ./cmd/auth-service
+
+run-users:
+	go run ./cmd/user-service
 
 run-auth-postgres:
 	docker compose -f deployments/docker-compose.yml up -d

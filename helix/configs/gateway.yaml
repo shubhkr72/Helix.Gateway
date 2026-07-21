@@ -7,7 +7,7 @@ timeouts:
 
 jwt:
   issuer: helix-auth
-  audience: helix-gateway
+  audience: helix-api
   public_key: keys/public.pem
 
 routes:
