@@ -23,6 +23,8 @@ type Config struct {
 
 	JWT JWTConfig `yaml:"jwt"`
 
+	Redis RedisConfig `yaml:"redis"`
+
 	Routes []Route `yaml:"routes"`
 }
 
@@ -36,6 +38,10 @@ type RateLimitConfig struct {
 	Capacity    float64 `yaml:"capacity"`
 	RefillRate  float64 `yaml:"refill_rate"`
 	KeyStrategy string  `yaml:"key_strategy"`
+}
+
+type RedisConfig struct {
+	Addr string `yaml:"addr"`
 }
 
 type Route struct {

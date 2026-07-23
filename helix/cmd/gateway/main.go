@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -45,14 +46,19 @@ func main() {
 
 		proxies[route.ID] = p
 
-		limiters[route.ID] = ratelimiter.NewMemoryLimiter(
+		limiter, err := ratelimiter.NewRedisLimiter(
+			cfg.Redis.Addr,
 			ratelimiter.Config{
 				Capacity:    route.RateLimit.Capacity,
 				RefillRate:  route.RateLimit.RefillRate,
 				KeyStrategy: route.RateLimit.KeyStrategy,
 			},
-			ratelimiter.RealClock{},
 		)
+		if err != nil {
+			log.Fatalf("failed to create redis limiter for route %q: %v", route.ID, err)
+		}
+
+		limiters[route.ID] = limiter
 	}
 
 	handler := &handlers.Gateway{
@@ -74,6 +80,9 @@ func main() {
 		),
 	)
 
-	log.Println("Gateway listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", handlerWithMiddleware))
+	addr := fmt.Sprintf(":%d", cfg.Server.Port)
+
+	log.Printf("Gateway listening on %s", addr)
+
+	log.Fatal(http.ListenAndServe(addr, handlerWithMiddleware))
 }

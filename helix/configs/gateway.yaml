@@ -10,6 +10,9 @@ jwt:
   audience: helix-api
   public_key: keys/public.pem
 
+redis:
+  addr: localhost:6379
+
 routes:
   - id: auth
     path: /auth
