@@ -31,6 +31,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	redisClient, err := ratelimiter.NewRedisClient(cfg.Redis.Addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer redisClient.Close()
+
 	proxies := make(map[string]*proxy.Gateway)
 	limiters := make(map[string]ratelimiter.Limiter)
 
@@ -46,19 +52,14 @@ func main() {
 
 		proxies[route.ID] = p
 
-		limiter, err := ratelimiter.NewRedisLimiter(
-			cfg.Redis.Addr,
+		limiters[route.ID] = ratelimiter.NewRedisLimiter(
+			redisClient,
 			ratelimiter.Config{
 				Capacity:    route.RateLimit.Capacity,
 				RefillRate:  route.RateLimit.RefillRate,
 				KeyStrategy: route.RateLimit.KeyStrategy,
 			},
 		)
-		if err != nil {
-			log.Fatalf("failed to create redis limiter for route %q: %v", route.ID, err)
-		}
-
-		limiters[route.ID] = limiter
 	}
 
 	handler := &handlers.Gateway{
@@ -73,9 +74,7 @@ func main() {
 			middleware.RateLimit(
 				cfg,
 				limiters,
-				middleware.Logging(
-					handler,
-				),
+				middleware.Logging(handler),
 			),
 		),
 	)

@@ -7,22 +7,24 @@ import (
 )
 
 func TestRedisLimiter(t *testing.T) {
+	client, err := NewRedisClient("localhost:6379")
+	if err != nil {
+		t.Fatalf("failed to connect to redis: %v", err)
+	}
+	defer client.Close()
+
 	cfg := Config{
 		Capacity:    3,
 		RefillRate:  1,
 		KeyStrategy: "ip",
 	}
 
-	limiter, err := NewRedisLimiter("localhost:6379", cfg)
-	if err != nil {
-		t.Fatalf("failed to connect to redis: %v", err)
-	}
-	defer limiter.Close()
+	limiter := NewRedisLimiter(client, cfg)
 
 	ctx := context.Background()
 	key := "redis-test"
 
-	limiter.client.Del(ctx, "ratelimit:"+key)
+	client.Del(ctx, "ratelimit:"+key)
 
 	for i := 0; i < 3; i++ {
 		ok, err := limiter.Allow(ctx, key)

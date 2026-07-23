@@ -15,7 +15,7 @@ type RedisLimiter struct {
 	script   *redis.Script
 }
 
-func NewRedisLimiter(addr string, cfg Config) (*RedisLimiter, error) {
+func NewRedisClient(addr string) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})
@@ -24,12 +24,16 @@ func NewRedisLimiter(addr string, cfg Config) (*RedisLimiter, error) {
 		return nil, err
 	}
 
+	return client, nil
+}
+
+func NewRedisLimiter(client *redis.Client, cfg Config) *RedisLimiter {
 	return &RedisLimiter{
 		client:   client,
 		capacity: cfg.Capacity,
 		refill:   cfg.RefillRate,
 		script:   redis.NewScript(luaTokenBucket),
-	}, nil
+	}
 }
 
 func (r *RedisLimiter) Allow(ctx context.Context, key string) (bool, error) {
@@ -51,8 +55,4 @@ func (r *RedisLimiter) Allow(ctx context.Context, key string) (bool, error) {
 	}
 
 	return value == 1, nil
-}
-
-func (r *RedisLimiter) Close() error {
-	return r.client.Close()
 }
