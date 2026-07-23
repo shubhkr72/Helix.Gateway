@@ -10,6 +10,7 @@ import (
 	"github.com/shubhkr72/helix/internal/jwt"
 	"github.com/shubhkr72/helix/internal/middleware"
 	"github.com/shubhkr72/helix/internal/proxy"
+	"github.com/shubhkr72/helix/internal/ratelimiter"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 	}
 
 	proxies := make(map[string]*proxy.Gateway)
+	limiters := make(map[string]ratelimiter.Limiter)
 
 	for _, route := range cfg.Routes {
 		if len(route.Backend) == 0 {
@@ -42,6 +44,15 @@ func main() {
 		}
 
 		proxies[route.ID] = p
+
+		limiters[route.ID] = ratelimiter.NewMemoryLimiter(
+			ratelimiter.Config{
+				Capacity:    route.RateLimit.Capacity,
+				RefillRate:  route.RateLimit.RefillRate,
+				KeyStrategy: route.RateLimit.KeyStrategy,
+			},
+			ratelimiter.RealClock{},
+		)
 	}
 
 	handler := &handlers.Gateway{
@@ -53,8 +64,12 @@ func main() {
 		middleware.Authentication(
 			cfg,
 			jwtManager,
-			middleware.Logging(
-				handler,
+			middleware.RateLimit(
+				cfg,
+				limiters,
+				middleware.Logging(
+					handler,
+				),
 			),
 		),
 	)

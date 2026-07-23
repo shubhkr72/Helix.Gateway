@@ -17,6 +17,10 @@ routes:
       - http://localhost:9001
     strip_prefix: true
     public: true
+    rate_limit:
+      capacity: 5
+      refill_rate: 2
+      key_strategy: ip
 
   - id: users
     path: /users
@@ -24,6 +28,10 @@ routes:
       - http://localhost:9002
     strip_prefix: true
     authenticated: true
+    rate_limit:
+      capacity: 100
+      refill_rate: 20
+      key_strategy: user
 
   - id: orders
     path: /orders
@@ -31,6 +39,10 @@ routes:
       - http://localhost:9003
     strip_prefix: false
     authenticated: true
+    rate_limit:
+      capacity: 50
+      refill_rate: 10
+      key_strategy: user
 
   - id: payments
     path: /payments
@@ -38,6 +50,10 @@ routes:
       - http://localhost:9004
     strip_prefix: false
     authenticated: true
+    rate_limit:
+      capacity: 20
+      refill_rate: 5
+      key_strategy: user
 
   - id: inventory
     path: /inventory
@@ -45,6 +61,10 @@ routes:
       - http://localhost:9005
     strip_prefix: true
     authenticated: true
+    rate_limit:
+      capacity: 50
+      refill_rate: 10
+      key_strategy: user
 
   - id: products
     path: /products
@@ -52,6 +72,10 @@ routes:
       - http://localhost:9006
     strip_prefix: true
     public: true
+    rate_limit:
+      capacity: 200
+      refill_rate: 50
+      key_strategy: ip
 
   - id: notifications
     path: /notifications
@@ -59,6 +83,10 @@ routes:
       - http://localhost:9007
     strip_prefix: false
     authenticated: true
+    rate_limit:
+      capacity: 30
+      refill_rate: 5
+      key_strategy: user
 
   - id: analytics
     path: /analytics
@@ -68,6 +96,10 @@ routes:
     authenticated: true
     roles:
       - admin
+    rate_limit:
+      capacity: 10
+      refill_rate: 2
+      key_strategy: user
 
   - id: reviews
     path: /reviews
@@ -75,6 +107,10 @@ routes:
       - http://localhost:9009
     strip_prefix: true
     public: true
+    rate_limit:
+      capacity: 100
+      refill_rate: 20
+      key_strategy: ip
 
   - id: search
     path: /search
@@ -82,3 +118,7 @@ routes:
       - http://localhost:9010
     strip_prefix: true
     public: true
+    rate_limit:
+      capacity: 300
+      refill_rate: 100
+      key_strategy: ip

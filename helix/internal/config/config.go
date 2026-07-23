@@ -32,14 +32,21 @@ type JWTConfig struct {
 	PublicKey string `yaml:"public_key"`
 }
 
+type RateLimitConfig struct {
+	Capacity    float64 `yaml:"capacity"`
+	RefillRate  float64 `yaml:"refill_rate"`
+	KeyStrategy string  `yaml:"key_strategy"`
+}
+
 type Route struct {
-	ID            string   `yaml:"id"`
-	Path          string   `yaml:"path"`
-	Backend       []string `yaml:"backend"`
-	StripPrefix   bool     `yaml:"strip_prefix"`
-	Public        bool     `yaml:"public"`
-	Authenticated bool     `yaml:"authenticated"`
-	Roles         []string `yaml:"roles"`
+	ID            string          `yaml:"id"`
+	Path          string          `yaml:"path"`
+	Backend       []string        `yaml:"backend"`
+	StripPrefix   bool            `yaml:"strip_prefix"`
+	Public        bool            `yaml:"public"`
+	Authenticated bool            `yaml:"authenticated"`
+	Roles         []string        `yaml:"roles"`
+	RateLimit     RateLimitConfig `yaml:"rate_limit"`
 }
 
 func Load(path string) (*Config, error) {
@@ -98,6 +105,20 @@ func validate(cfg Config) error {
 			if err != nil || u.Scheme == "" || u.Host == "" {
 				return fmt.Errorf("invalid backend %s", b)
 			}
+		}
+
+		if r.RateLimit.Capacity <= 0 {
+			return fmt.Errorf("%s has invalid rate limit capacity", r.ID)
+		}
+
+		if r.RateLimit.RefillRate <= 0 {
+			return fmt.Errorf("%s has invalid refill rate", r.ID)
+		}
+
+		switch r.RateLimit.KeyStrategy {
+		case "user", "ip", "api_key", "global":
+		default:
+			return fmt.Errorf("%s has invalid key strategy", r.ID)
 		}
 	}
 
