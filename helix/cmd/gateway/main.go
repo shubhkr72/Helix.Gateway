@@ -33,9 +33,10 @@ func main() {
 
 	redisClient, err := ratelimiter.NewRedisClient(cfg.Redis.Addr)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("WARNING: Redis unavailable: %v", err)
+	} else {
+		defer redisClient.Close()
 	}
-	defer redisClient.Close()
 
 	proxies := make(map[string]*proxy.Gateway)
 	limiters := make(map[string]ratelimiter.Limiter)

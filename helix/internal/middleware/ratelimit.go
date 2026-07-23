@@ -3,6 +3,7 @@ package middleware
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/shubhkr72/helix/internal/config"
 	"github.com/shubhkr72/helix/internal/ratelimiter"
@@ -29,7 +30,6 @@ func RateLimit(
 		}
 
 		var userID string
-
 		if v := r.Context().Value("userID"); v != nil {
 			if s, ok := v.(string); ok {
 				userID = s
@@ -42,13 +42,41 @@ func RateLimit(
 			userID,
 		)
 
-		allowed, err := limiter.Allow(r.Context(), key)
+		result, err := limiter.Allow(r.Context(), key)
 		if err != nil {
-			writeError(w, http.StatusInternalServerError, "rate limiter failure")
-			return
+
+			switch match.Route.RateLimit.FailurePolicy {
+
+			case "fail_open":
+				// Allow the request if Redis is unavailable.
+				next.ServeHTTP(w, r)
+				return
+
+			case "fail_closed":
+				fallthrough
+
+			default:
+				// Reject protected routes.
+				writeError(
+					w,
+					http.StatusServiceUnavailable,
+					"rate limiter unavailable",
+				)
+				return
+			}
 		}
 
-		if !allowed {
+		// Standard Rate Limit Headers
+		w.Header().Set("X-RateLimit-Limit", strconv.FormatInt(result.Limit, 10))
+		w.Header().Set("X-RateLimit-Remaining", strconv.FormatInt(result.Remaining, 10))
+		w.Header().Set("X-RateLimit-Reset", strconv.FormatInt(int64(result.ResetAfter.Seconds()), 10))
+
+		if !result.Allowed {
+			w.Header().Set(
+				"Retry-After",
+				strconv.FormatInt(int64(result.RetryAfter.Seconds()), 10),
+			)
+
 			writeError(w, http.StatusTooManyRequests, "rate limit exceeded")
 			return
 		}

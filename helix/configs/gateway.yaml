@@ -24,6 +24,7 @@ routes:
       capacity: 5
       refill_rate: 2
       key_strategy: ip
+      failure_policy: fail_open
 
   - id: users
     path: /users
@@ -35,6 +36,7 @@ routes:
       capacity: 100
       refill_rate: 20
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: orders
     path: /orders
@@ -46,6 +48,7 @@ routes:
       capacity: 50
       refill_rate: 10
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: payments
     path: /payments
@@ -57,6 +60,7 @@ routes:
       capacity: 20
       refill_rate: 5
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: inventory
     path: /inventory
@@ -68,6 +72,7 @@ routes:
       capacity: 50
       refill_rate: 10
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: products
     path: /products
@@ -79,6 +84,7 @@ routes:
       capacity: 200
       refill_rate: 50
       key_strategy: ip
+      failure_policy: fail_open
 
   - id: notifications
     path: /notifications
@@ -90,6 +96,7 @@ routes:
       capacity: 30
       refill_rate: 5
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: analytics
     path: /analytics
@@ -103,6 +110,7 @@ routes:
       capacity: 10
       refill_rate: 2
       key_strategy: user
+      failure_policy: fail_closed
 
   - id: reviews
     path: /reviews
@@ -114,6 +122,7 @@ routes:
       capacity: 100
       refill_rate: 20
       key_strategy: ip
+      failure_policy: fail_open
 
   - id: search
     path: /search
@@ -125,3 +134,4 @@ routes:
       capacity: 300
       refill_rate: 100
       key_strategy: ip
+      failure_policy: fail_open

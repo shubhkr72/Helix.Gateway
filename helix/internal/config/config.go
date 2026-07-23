@@ -35,9 +35,11 @@ type JWTConfig struct {
 }
 
 type RateLimitConfig struct {
-	Capacity    float64 `yaml:"capacity"`
-	RefillRate  float64 `yaml:"refill_rate"`
-	KeyStrategy string  `yaml:"key_strategy"`
+	Enabled       bool    `yaml:"enabled"`
+	Capacity      float64 `yaml:"capacity"`
+	RefillRate    float64 `yaml:"refill_rate"`
+	KeyStrategy   string  `yaml:"key_strategy"`
+	FailurePolicy string  `yaml:"failure_policy"`
 }
 
 type RedisConfig struct {

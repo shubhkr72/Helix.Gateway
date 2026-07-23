@@ -26,34 +26,59 @@ func TestRedisLimiter(t *testing.T) {
 
 	client.Del(ctx, "ratelimit:"+key)
 
+	// First 3 requests should be allowed.
 	for i := 0; i < 3; i++ {
-		ok, err := limiter.Allow(ctx, key)
+		result, err := limiter.Allow(ctx, key)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if !ok {
+		if !result.Allowed {
 			t.Fatalf("request %d should be allowed", i+1)
 		}
+
+		t.Logf(
+			"Request %d -> Allowed=%v Remaining=%d RetryAfter=%v ResetAfter=%v",
+			i+1,
+			result.Allowed,
+			result.Remaining,
+			result.RetryAfter,
+			result.ResetAfter,
+		)
 	}
 
-	ok, err := limiter.Allow(ctx, key)
+	// Fourth request should be rejected.
+	result, err := limiter.Allow(ctx, key)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if ok {
+	if result.Allowed {
 		t.Fatal("expected rate limit exceeded")
 	}
 
+	t.Logf(
+		"Rejected -> Remaining=%d RetryAfter=%v ResetAfter=%v",
+		result.Remaining,
+		result.RetryAfter,
+		result.ResetAfter,
+	)
+
+	// Wait for refill.
 	time.Sleep(2 * time.Second)
 
-	ok, err = limiter.Allow(ctx, key)
+	result, err = limiter.Allow(ctx, key)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !ok {
+	if !result.Allowed {
 		t.Fatal("expected token refill")
 	}
+
+	t.Logf(
+		"After refill -> Allowed=%v Remaining=%d",
+		result.Allowed,
+		result.Remaining,
+	)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -36,7 +37,11 @@ func NewRedisLimiter(client *redis.Client, cfg Config) *RedisLimiter {
 	}
 }
 
-func (r *RedisLimiter) Allow(ctx context.Context, key string) (bool, error) {
+func (r *RedisLimiter) Allow(ctx context.Context, key string) (Result, error) {
+	if r.client == nil {
+		return Result{}, errors.New("redis unavailable")
+	}
+
 	result, err := r.script.Run(
 		ctx,
 		r.client,
@@ -46,13 +51,43 @@ func (r *RedisLimiter) Allow(ctx context.Context, key string) (bool, error) {
 	).Result()
 
 	if err != nil {
-		return false, err
+		return Result{}, err
 	}
 
-	value, ok := result.(int64)
+	values, ok := result.([]interface{})
 	if !ok {
-		return false, errors.New("unexpected redis response")
+		return Result{}, errors.New("unexpected redis response type")
 	}
 
-	return value == 1, nil
+	if len(values) != 4 {
+		return Result{}, errors.New("unexpected redis response length")
+	}
+
+	allowed, ok := values[0].(int64)
+	if !ok {
+		return Result{}, errors.New("invalid allowed value")
+	}
+
+	remaining, ok := values[1].(int64)
+	if !ok {
+		return Result{}, errors.New("invalid remaining value")
+	}
+
+	retryAfter, ok := values[2].(int64)
+	if !ok {
+		return Result{}, errors.New("invalid retry_after value")
+	}
+
+	resetAfter, ok := values[3].(int64)
+	if !ok {
+		return Result{}, errors.New("invalid reset_after value")
+	}
+
+	return Result{
+		Allowed:    allowed == 1,
+		Limit:      int64(r.capacity),
+		Remaining:  remaining,
+		RetryAfter: time.Duration(retryAfter) * time.Second,
+		ResetAfter: time.Duration(resetAfter) * time.Second,
+	}, nil
 }
